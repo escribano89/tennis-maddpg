@@ -14,7 +14,7 @@ BATCH_SIZE = 128
 # Discount Gamma
 GAMMA = 0.995 
 # Soft Update Value
-TAU = 1e-3  
+TAU = 1e-2  
 # Learning rates for each NN      
 LR_ACTOR = 1e-3 
 LR_CRITIC = 1e-3
@@ -25,13 +25,13 @@ N_EXPERIENCES = 16
 # Noise parameters
 OU_MU = 0.0
 # Volatility
-OU_SIGMA = 0.24       
+OU_SIGMA = 0.2       
 # Speed of mean reversion   
-OU_THETA = 0.12 
+OU_THETA = 0.1 
 # Initial value for the decayment
-EPS_START = 3.2  
+EPS_START = 2.4  
 # Episode to end the decay process    
-EPS_EPISODE_END = 120 
+EPS_EPISODE_END = 256 
 # Final epsilon value 
 EPS_FINAL = 0  
 
@@ -117,6 +117,8 @@ class DDPG():
         # Minimize the loss
         self.critic_optimizer.zero_grad()
         critic_loss.backward()
+        # Clip critic gradient
+        torch.nn.utils.clip_grad_norm_(self.critic_regular.parameters(), 1)
         self.critic_optimizer.step()
 
         # Update the actor neural network
