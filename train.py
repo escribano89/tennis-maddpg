@@ -13,9 +13,9 @@ import matplotlib.pyplot as plt
 from agent import DDPG
 
 # Unity env executable path
-UNITY_EXE_PATH = 'Reacher.exe'
+UNITY_EXE_PATH = 'Tennis.exe'
 # Environment Goal
-GOAL = 30.1
+GOAL = 0.5
 # Averaged score
 SCORE_AVERAGED = 100
 # Let us know the progress each 10 timesteps
