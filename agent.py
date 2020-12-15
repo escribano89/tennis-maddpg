@@ -14,7 +14,7 @@ BATCH_SIZE = 128
 # Discount Gamma
 GAMMA = 0.995 
 # Soft Update Value
-TAU = 1e-2   
+TAU = 1e-3  
 # Learning rates for each NN      
 LR_ACTOR = 1e-3 
 LR_CRITIC = 1e-3
