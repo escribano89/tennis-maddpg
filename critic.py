@@ -11,11 +11,11 @@ class Critic(nn.Module):
         self.seed = torch.manual_seed(seed)
         
         self.bn0 = nn.BatchNorm1d(state_size)
-        self.fcs1 = nn.Linear(state_size, 128)
-        self.fc2 = nn.Linear(128 + action_size, 64)
-        self.fc3 = nn.Linear(64, 32)
-        self.fc4 = nn.Linear(32, 16)
-        self.fc5 = nn.Linear(16, 1)
+        self.fcs1 = nn.Linear(state_size, 64)
+        self.fc2 = nn.Linear(64 + action_size, 32)
+        self.fc3 = nn.Linear(32, 16)
+        self.fc4 = nn.Linear(16, 8)
+        self.fc5 = nn.Linear(8, 1)
 
 
     def forward(self, state, action):

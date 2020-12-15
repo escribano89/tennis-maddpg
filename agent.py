@@ -5,11 +5,12 @@ import torch
 import torch.nn.functional as F
 import torch.optim as optim
 from replay_buffer import ReplayBuffer
+from ou_noise import OUNoise
 
 # Replay Buffer Size
 BUFFER_SIZE = int(1e6)
 # Minibatch Size
-BATCH_SIZE = 256 
+BATCH_SIZE = 128 
 # Discount Gamma
 GAMMA = 0.995 
 # Soft Update Value
@@ -21,14 +22,25 @@ LR_CRITIC = 1e-3
 UPDATE_EVERY = 32
 # Learn from batch of experiences n_experiences times
 N_EXPERIENCES = 16   
-
+# Noise parameters
+OU_MU = 0.0
+# Volatility
+OU_SIGMA = 0.24       
+# Speed of mean reversion   
+OU_THETA = 0.12 
+# Initial value for the decayment
+EPS_START = 3.2  
+# Episode to end the decay process    
+EPS_EPISODE_END = 120 
+# Final epsilon value 
+EPS_FINAL = 0  
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
 class DDPG():
     """Interacts with and learns from the environment using the DDPG algorithm."""
 
-    def __init__(self, state_size, action_size, random_seed):
+    def __init__(self, state_size, action_size, n_agents, random_seed):
         self.state_size = state_size
         self.action_size = action_size
         self.seed = random.seed(random_seed)
@@ -45,7 +57,13 @@ class DDPG():
 
         # Replay memory
         self.memory = ReplayBuffer(action_size, BUFFER_SIZE, BATCH_SIZE, random_seed)
-          
+        
+        # Exploration noise
+        self.noise = OUNoise((n_agents, action_size), random_seed, OU_MU, OU_THETA, OU_SIGMA)
+        
+        self.eps = EPS_START
+        self.eps_decay = 1 / (EPS_EPISODE_END * N_EXPERIENCES) 
+        
         # Ensure that both networks have the same weights
         self.deep_copy(self.actor_target, self.actor_regular)
         self.deep_copy(self.critic_target, self.critic_regular)
@@ -74,7 +92,9 @@ class DDPG():
             actions = self.actor_regular(states).cpu().data.numpy()
         # Enable Training mode
         self.actor_regular.train()
-
+        
+        # Include exploration noise
+        actions += self.eps * self.noise.sample()
         return actions
 
 
@@ -113,7 +133,11 @@ class DDPG():
         # Update target network using the soft update approach (slowly updating)
         self.soft_update(self.critic_regular, self.critic_target, TAU)
         self.soft_update(self.actor_regular, self.actor_target, TAU)
-
+        
+        # Update noise and add decayment
+        self.eps -= self.eps_decay
+        self.eps = max(self.eps, EPS_FINAL)
+        self.noise.reset()
 
     def soft_update(self, local_model, target_model, tau):
         # Update the target network slowly to improve the stability
