@@ -42,7 +42,7 @@ def train(n_episodes=N_EPISODES):
         for t in range(MAX_TIMESTEPS):
 
             # Act according to our policy
-            actions = agent.act(states)
+            actions = agent.act(states, False)
             # Send the decided actions to all the agents
             env_info = env.step(actions)[brain_name]        
             # Get next state for each agent

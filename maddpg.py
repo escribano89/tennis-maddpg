@@ -17,7 +17,7 @@ class MADDPG():
         self.n_agents = n_agents
         
          # Exploration noise
-        self.noise_enabled = True
+        self.noise_enabled = False
         self.noise_value = NOISE_START
         self.noise_decay = NOISE_DECAY
         
@@ -29,7 +29,7 @@ class MADDPG():
     def setup_agents(self, n_agents):
         agents = []
         for i in range(n_agents):
-            agents.append(DDPG(i, self.state_size, self.action_size, self.seed))
+            agents.append(DDPG(i, self.state_size, self.action_size, self.n_agents, self.seed))
         return agents
 
     def step(self, states, actions, rewards, next_states, dones, timestep):
@@ -71,8 +71,7 @@ class MADDPG():
         actions = []
         for i, agent in enumerate(self.agents):
             states, _ , _ , next_states, _ = experiences[i]
-            agent_id = torch.tensor([i]).to(device)
-
+            agent_id = torch.tensor([i]).to(device)            
             state = states.reshape(-1, self.action_size, self.state_size).index_select(1, agent_id).squeeze(1)
             action = agent.actor_regular(state)
             actions.append(action)

@@ -5,24 +5,23 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 class Critic(nn.Module):
-    def __init__(self, state_size, action_size, seed):
+    def __init__(self, state_size, action_size, n_agents, seed):
 
         super(Critic, self).__init__()
         self.seed = torch.manual_seed(seed)
 
-        self.bn0 = nn.BatchNorm1d(state_size)
-        self.fcs1 = nn.Linear(state_size, 64)
-        self.fc2 = nn.Linear(64 + action_size, 32)
+        self.bn0 = nn.BatchNorm1d((state_size+action_size)*n_agents)
+        self.fcs1 = nn.Linear( (state_size+action_size)*n_agents, 64)
+        self.fc2 = nn.Linear(64, 32)
         self.fc3 = nn.Linear(32, 16)
         self.fc4 = nn.Linear(16, 8)
         self.fc5 = nn.Linear(8, 1)
 
 
     def forward(self, state, action):
-        state = state.unsqueeze(0)
-        state = self.bn0(state)
-        x_state = F.selu(self.fcs1(state))
-        x = torch.cat((x_state, action), dim=1)
+        x = torch.cat((state, action), dim=1)
+        state = self.bn0(x)
+        x = F.selu(self.fcs1(state))
         x = F.selu(self.fc2(x))
         x = F.selu(self.fc3(x))
         x = F.selu(self.fc4(x))

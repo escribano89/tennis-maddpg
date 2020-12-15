@@ -24,9 +24,6 @@ class Actor(nn.Module):
 
     def forward(self, state):
         """Build an actor (policy) network that maps states -> actions."""
-
-        state = state.unsqueeze(0)
-
         x = self.bn0(state)
         x = F.selu(self.bn1(self.fc1(x)))
         x = F.selu(self.bn2(self.fc2(x)))

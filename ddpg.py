@@ -15,11 +15,12 @@ device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 class DDPG():
     """Interacts with and learns from the environment using the DDPG algorithm."""
 
-    def __init__(self, agent_id, state_size, action_size, random_seed):
+    def __init__(self, agent_id, state_size, action_size, n_agents, random_seed):
         self.id = agent_id
         self.state_size = state_size
         self.action_size = action_size
         self.seed = random.seed(random_seed)
+        self.n_agents = n_agents
 
         # Actor Neural Network (Regular and target)
         self.actor_regular = Actor(state_size, action_size, random_seed).to(device)
@@ -27,8 +28,8 @@ class DDPG():
         self.actor_optimizer = optim.Adam(self.actor_regular.parameters(), lr=LR_ACTOR)
 
         # Critic Neural Network (Regular and target)
-        self.critic_regular = Critic(state_size, action_size, random_seed).to(device)
-        self.critic_target = Critic(state_size, action_size, random_seed).to(device)
+        self.critic_regular = Critic(state_size, action_size, n_agents, random_seed).to(device)
+        self.critic_target = Critic(state_size, action_size, n_agents, random_seed).to(device)
         self.critic_optimizer = optim.Adam(self.critic_regular.parameters(), lr=LR_CRITIC)
      
         # Exploration noise
@@ -47,7 +48,7 @@ class DDPG():
         self.actor_regular.eval()
         
         with torch.no_grad():
-            action = self.actor_regular(states).cpu().data.numpy()
+            action = self.actor_regular(states.unsqueeze(0)).cpu().data.numpy()
         
         self.actor_regular.train()
         
@@ -63,10 +64,10 @@ class DDPG():
         # Update the critic neural network
         agent_id = torch.tensor([agent_id]).to(device)
         actions_next = torch.cat(all_next_actions, dim=1).to(device)
-        
+
         with torch.no_grad():
             Q_targets_next = self.critic_target(next_states, actions_next)
-
+            
         Q_expected = self.critic_regular(states, actions)
         # Compute Q targets for current states filtered by agent id
         Q_targets = rewards.index_select(1, agent_id) + (gamma * Q_targets_next * (1 - dones.index_select(1, agent_id)))
