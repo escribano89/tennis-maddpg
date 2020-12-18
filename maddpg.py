@@ -3,60 +3,70 @@ import torch
 from replay_buffer import ReplayBuffer
 from ddpg import DDPG
 import numpy as np
+from actor_critic import ActorCritic
 from params import  (
-    BUFFER_SIZE, BATCH_SIZE, NOISE_EPISODE_STOP, UPDATE_EVERY, NOISE_START, NOISE_DECAY, GAMMA    
+    BUFFER_SIZE, BATCH_SIZE, 
+    EPSILON, UPDATE_EVERY, 
+    EPSILON_MIN, EXPLORATION_STEPS,
+    N_EXPERIENCES, DEVICE  
 )
 
-device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
 class MADDPG():
     def __init__(self, state_size, action_size, n_agents, random_seed):
         self.state_size = state_size
         self.action_size = action_size
-        self.seed = random_seed
+        self.random_seed = random_seed
+        # Number of agents
         self.n_agents = n_agents
-        
          # Exploration noise
-        self.noise_enabled = False
-        self.noise_value = NOISE_START
-        self.noise_decay = NOISE_DECAY
-        
-        # Initiate n DDPG agents
-        self.agents = self.setup_agents(n_agents)
-        # Replay memory
+        self.epsilon = EPSILON
+        self.epsilon_min = EPSILON_MIN
+        self.exploration_steps = EXPLORATION_STEPS
+        self.epsilon_decay = (self.epsilon - (self.epsilon_min) * N_EXPERIENCES) / (self.exploration_steps ) 
+        self.noise_enabled = True
+        # Timestep progressive counter
+        self.timestep_counter = 0
+        # Setup n DDPG agents
+        self.agents = self.setup_agents()
+        # Experience Replay
         self.memory = ReplayBuffer(action_size, BUFFER_SIZE, BATCH_SIZE, random_seed)
     
-    def setup_agents(self, n_agents):
+    def setup_agents(self):
         agents = []
-        for i in range(n_agents):
-            agents.append(DDPG(i, self.state_size, self.action_size, self.n_agents, self.seed))
+        for i in range(self.n_agents):
+            model = ActorCritic(
+                n_agents=self.n_agents, state_size=self.state_size, action_size=self.action_size, seed=self.random_seed
+            )
+            agents.append(DDPG(i, model, self.action_size, self.random_seed))
         return agents
-
-    def step(self, states, actions, rewards, next_states, dones, timestep):
+        
+    def step(self, states, actions, rewards, next_states, dones):
         # Flat states and next states
         states = states.reshape(1, -1)
         next_states = next_states.reshape(1, -1)
         # Add experience to the buffer
         self.memory.add(states, actions, rewards, next_states, dones)
         
-        # Check if we should stop noise depending on the current timestep
-        if timestep >= NOISE_EPISODE_STOP:
-            self.noise_enabled = False
-        
+        self.timestep_counter = self.timestep_counter + 1 
+
         # Learn from our buffer if possible
-        if len(self.memory) > BATCH_SIZE and timestep % UPDATE_EVERY == 0:
+        if len(self.memory) > BATCH_SIZE and self.timestep_counter % UPDATE_EVERY == 0:
             # Sample experiences for each agent
-            experiences = [self.memory.sample() for _ in range(self.n_agents)]
-            self.learn(experiences, GAMMA)
+            for _ in range(N_EXPERIENCES):
+                experiences = [self.memory.sample() for _ in range(self.n_agents)]
+                self.learn(experiences)
                 
     
-    def act(self, states, add_noise=True):
+    def act(self, states):
         actions = []
         for agent, state in zip(self.agents, states):
-            action = agent.act(state, noise_value=self.noise_value, add_noise=self.noise_enabled)
-            # Decay noise
-            self.noise_value *= self.noise_decay
+            action = agent.act(state, noise_value=self.epsilon, add_noise=self.noise_enabled)
             actions.append(action)
+            
+        if self.epsilon > self.epsilon_min:
+            self.epsilon -= self.epsilon_decay
+                
         # Return flattened actions
         return np.array(actions).reshape(1, -1)
     
@@ -66,12 +76,13 @@ class MADDPG():
             torch.save(agent.actor_regular.state_dict(),  "actor_agent_{}.pth".format(i))
             torch.save(agent.critic_regular.state_dict(), "critic_agent_{}.pth".format(i))
 
-    def learn(self, experiences, gamma):
+    def learn(self, experiences):
         next_actions = []
         actions = []
         for i, agent in enumerate(self.agents):
             states, _ , _ , next_states, _ = experiences[i]
-            agent_id = torch.tensor([i]).to(device)            
+            agent_id = torch.tensor([i]).to(DEVICE)            
+            
             state = states.reshape(-1, self.action_size, self.state_size).index_select(1, agent_id).squeeze(1)
             action = agent.actor_regular(state)
             actions.append(action)
@@ -83,15 +94,6 @@ class MADDPG():
         # Call to the method learn for each agent using
         # the related experiences and all actions/next actions
         for i, agent in enumerate(self.agents):
-            agent.learn(i, experiences[i], gamma, next_actions, actions)
-
-    def soft_update(self, local_model, target_model, tau):
-        # Update the target network slowly to improve the stability
-        for target_param, local_param in zip(target_model.parameters(), local_model.parameters()):
-            target_param.data.copy_(tau*local_param.data + (1.0-tau) * target_param.data)
-
-    def deep_copy(self, target, source):
-        for target_param, param in zip(target.parameters(), source.parameters()):
-            target_param.data.copy_(param.data)
+            agent.learn(self.memory, i, experiences[i], next_actions, actions)
 
 

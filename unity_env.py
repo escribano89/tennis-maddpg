@@ -4,7 +4,7 @@ from unityagents import UnityEnvironment
 def init_environment(executable_path): 
     
     # Init the Reacher Unity Environment
-    env = UnityEnvironment(file_name=executable_path)
+    env = UnityEnvironment(file_name=executable_path, no_graphics=True)
     # Get the default brain
     brain_name = env.brain_names[0]
     brain = env.brains[brain_name]
