@@ -15,7 +15,7 @@ N_EPISODES = 3000
 # Max Timesteps
 MAX_TIMESTEPS = 1000
 # Replay Buffer Size
-BUFFER_SIZE = int(2e4)
+BUFFER_SIZE = 12000
 # Minibatch Size
 BATCH_SIZE = 256 
 # Discount Gamma
