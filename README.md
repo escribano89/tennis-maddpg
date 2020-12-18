@@ -86,9 +86,9 @@ If you want to train the agents, execute the **train.py** file. After reaching t
 
 ## Trace of the training
 
-![Training](https://github.com/escribano89/reacher-ddpg/blob/main/score.PNG)
+![Training](https://github.com/escribano89/tennis-maddpg/blob/main/score.PNG)
 
-![Training](https://github.com/escribano89/reacher-ddpg/blob/main/trace.PNG)
+![Training](https://github.com/escribano89/tennis-maddpg/blob/main/trace.PNG)
 
 ## Video
 
