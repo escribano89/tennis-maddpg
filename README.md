@@ -60,7 +60,7 @@ In order to prepare the environment, follow the next steps after downloading thi
 
 * Unzip the downloaded file and move it inside the project's root directory
 * Change the kernel of you environment to `drlnd`
-* Open the **params.py** file and change the path to the unity environment appropriately (UNITY_EXE_PATH=PATH_OF_THE_REACHER_EXE)
+* Open the **params.py** file and change the path to the unity environment appropriately (UNITY_EXE_PATH=PATH_OF_THE_TENNIS_EXE)
 
 ## Getting started
 
