@@ -2,9 +2,8 @@
 from unity_env import init_environment
 import numpy as np
 from maddpg import MADDPG
+from params import UNITY_EXE_PATH
 
-# Unity env executable path
-UNITY_EXE_PATH = 'Tennis.exe'
 
 # Init the reacher environment and get agents, state and action info
 env, brain_name, n_agents, state_size, action_size = init_environment(UNITY_EXE_PATH, train=False)
@@ -24,7 +23,6 @@ while True:
     dones = env_info.local_done                        
     scores += env_info.rewards                         
     states = next_states                              
-    if np.any(dones):                                  
-        break
+
 
 env.close()
