@@ -3,26 +3,46 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+import numpy as np
+
 
 class Critic(nn.Module):
-    def __init__(self, state_size, action_size, seed):
-
+    def __init__(self, input_size, seed):
+        
         super(Critic, self).__init__()
         self.seed = torch.manual_seed(seed)
         
-        self.bn0 = nn.BatchNorm1d(state_size)
-        self.fcs1 = nn.Linear(state_size, 64)
-        self.fc2 = nn.Linear(64 + action_size, 32)
-        self.fc3 = nn.Linear(32, 16)
-        self.fc4 = nn.Linear(16, 8)
-        self.fc5 = nn.Linear(8, 1)
+        self.fc1 = nn.Linear(input_size, 256)
+        self.fc2 = nn.Linear(256, 128)
+        self.fc3 = nn.Linear(128, 64)
+        self.fc4 = nn.Linear(64, 32)
+        self.fc5 = nn.Linear(32, 1)
+        
+        self.bn1 = nn.BatchNorm1d(256)
 
+        self.reset_parameters()
 
-    def forward(self, state, action):
-        state = self.bn0(state)
-        x_state = F.selu(self.fcs1(state))
-        x = torch.cat((x_state, action), dim=1)
-        x = F.selu(self.fc2(x))
-        x = F.selu(self.fc3(x))
-        x = F.selu(self.fc4(x))
-        return  F.selu(self.fc5(x))
+    
+    def forward(self, states, actions):
+        x_state_action = torch.cat((states, actions), dim=1)
+        
+        x = F.relu(self.fc1(x_state_action))
+        x = self.bn1(x)
+        x = F.relu(self.fc2(x))
+        x = F.relu(self.fc3(x))
+        x = F.relu(self.fc4(x))
+        x = self.fc5(x)
+        
+        return x
+    
+    def reset_parameters(self):
+        self.fc1.weight.data.uniform_(*hidden_init(self.fc1))
+        self.fc2.weight.data.uniform_(*hidden_init(self.fc2))
+        self.fc3.weight.data.uniform_(*hidden_init(self.fc3))
+        self.fc4.weight.data.uniform_(*hidden_init(self.fc4))
+        self.fc5.weight.data.uniform_(-3e-3, 3e-3)
+
+def hidden_init(layer):
+    fan_in = layer.weight.data.size()[0]
+    lim = 1. / np.sqrt(fan_in)
+    return (-lim, lim)
