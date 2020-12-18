@@ -1,4 +1,4 @@
-# Udacity - Deep Reinforcement Learning Nanodegree (Continuous Control)
+# Udacity - Deep Reinforcement Learning Nanodegree (Collaboration and Competition)
 
 ### Project Details
 
