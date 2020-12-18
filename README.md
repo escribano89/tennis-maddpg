@@ -48,7 +48,7 @@ In order to prepare the environment, follow the next steps after downloading thi
 ```
 
 * Download the environment from one of the links below.  You need only select the environment that matches your operating system:
-
+     - Links
         - Linux: [click here](https://s3-us-west-1.amazonaws.com/udacity-drlnd/P3/Tennis/Tennis_Linux.zip)
         - Mac OSX: [click here](https://s3-us-west-1.amazonaws.com/udacity-drlnd/P3/Tennis/Tennis.app.zip)
         - Windows (32-bit): [click here](https://s3-us-west-1.amazonaws.com/udacity-drlnd/P3/Tennis/Tennis_Windows_x86.zip)
@@ -60,7 +60,7 @@ In order to prepare the environment, follow the next steps after downloading thi
 
 * Unzip the downloaded file and move it inside the project's root directory
 * Change the kernel of you environment to `drlnd`
-* Open the **params.py** file and change the path to the unity environment appropriately (UNITY_EXE_PATH=PATH_OF_THE_REACHER_EXE)
+* Open the **params.py** file and change the path to the unity environment appropriately (UNITY_EXE_PATH=PATH_OF_THE_TENNIS_EXE)
 
 ## Getting started
 
