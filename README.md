@@ -72,13 +72,17 @@ If you want to train the agents, execute the **train.py** file. After reaching t
 ## Resources
 
 * report.pdf: A document that describes the details of the implementation and future proposals.
-* agent: implemented agent using the DDPG algorithm (without exploration noise)
+* madddpg: implemented agent using the MADDPG algorithm (contains ddpg agents)
+* ddpg: ddpg agent
 * actor: the actor NN model
 * critic: the critic NN model
+* actor_critic: The actor-critic model.
 * unity_env: a class for handling the unity environment
 * replay_buffer: a class for handling the experience replay
-* test.py: Entry point for testing the agent using the trained networks
-* actor_theta.pth, critic_theta.pth: Our model's weights ***(Solved in less than 120 episodes)***
+* ou_noise: a class for handling the initial exploration noise
+* test.py: Entry point for testing the agents using the trained networks
+* train.py: Entry point for training the agents using MADDPG algorithm
+* *.pth files: Our model's weights ***(Solved in less than 1100 episodes)***
 
 ## Trace of the training
 
@@ -88,6 +92,6 @@ If you want to train the agents, execute the **train.py** file. After reaching t
 
 ## Video
 
-You can find an example of the trained agent [here](https://youtu.be/Lm9tgbPyDFM)
+You can find an example of the trained agents [here](https://youtu.be/ii6CPP9cpIM)
 
-[![Navigation](https://img.youtube.com/vi/Lm9tgbPyDFM/0.jpg)](https://youtu.be/Lm9tgbPyDFM)
+[![Navigation](https://img.youtube.com/vi/ii6CPP9cpIM/0.jpg)](https://youtu.be/ii6CPP9cpIM)
