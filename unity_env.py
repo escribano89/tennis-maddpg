@@ -1,15 +1,15 @@
 # -*- coding: utf-8 -*-
 from unityagents import UnityEnvironment
 
-def init_environment(executable_path): 
+def init_environment(executable_path, train=True): 
     
     # Init the Reacher Unity Environment
-    env = UnityEnvironment(file_name=executable_path, no_graphics=True)
+    env = UnityEnvironment(file_name=executable_path, no_graphics=train)
     # Get the default brain
     brain_name = env.brain_names[0]
     brain = env.brains[brain_name]
     # Reset the environment
-    env_info = env.reset(train_mode=True)[brain_name]
+    env_info = env.reset(train_mode=train)[brain_name]
     # Number of agents
     n_agents = len(env_info.agents)
     # Size of each action

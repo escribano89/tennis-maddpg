@@ -82,8 +82,7 @@ class DDPG():
         
         # Minimize the loss function
         actor_loss.backward()
-        # Actor gradient clipping to 1
-        torch.nn.utils.clip_grad_norm_(self.actor_regular.parameters(), 1) 
+
         self.actor_optimizer.step()
 
         # Update target network using the soft update approach (slowly updating)

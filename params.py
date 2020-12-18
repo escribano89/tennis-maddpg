@@ -8,8 +8,8 @@ UNITY_EXE_PATH = 'Tennis.exe'
 GOAL = 0.51
 # Averaged score
 SCORE_AVERAGED = 100
-# Let us know the progress each 10 timesteps
-PRINT_EVERY = 10
+# Let us know the progress each 100 episodes
+PRINT_EVERY = 50
 # Number of episode for training
 N_EPISODES = 3000
 # Max Timesteps
@@ -24,7 +24,7 @@ GAMMA = 0.995
 TAU = 1e-3
 # Learning rates for each NN      
 LR_ACTOR = 1e-3
-LR_CRITIC = 1e-4
+LR_CRITIC = 1e-3
 # Update network every X intervals
 UPDATE_EVERY = 2
 # Learn from batch of experiences n_experiences times

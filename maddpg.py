@@ -75,6 +75,12 @@ class MADDPG():
         for i, agent in enumerate(self.agents):
             torch.save(agent.actor_regular.state_dict(),  "actor_agent_{}.pth".format(i))
             torch.save(agent.critic_regular.state_dict(), "critic_agent_{}.pth".format(i))
+            
+    def load_weights(self):
+        # Load Weights
+        for i, agent in enumerate(self.agents):
+            agent.actor_regular.load_state_dict(torch.load("actor_agent_{}.pth".format(i)))
+            agent.critic_regular.load_state_dict(torch.load("critic_agent_{}.pth".format(i)))
 
     def learn(self, experiences):
         next_actions = []
