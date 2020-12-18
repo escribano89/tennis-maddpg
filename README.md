@@ -59,7 +59,7 @@ In order to prepare the environment, follow the next steps after downloading thi
     (_For AWS_) If you'd like to train the agent on AWS (and have not [enabled a virtual screen](https://github.com/Unity-Technologies/ml-agents/blob/master/docs/Training-on-Amazon-Web-Service.md)), then please use [this link](https://s3-us-west-1.amazonaws.com/udacity-drlnd/P2/Reacher/one_agent/Reacher_Linux_NoVis.zip) (version 1) or [this link](https://s3-us-west-1.amazonaws.com/udacity-drlnd/P2/Reacher/Reacher_Linux_NoVis.zip) (version 2) to obtain the "headless" version of the environment.  You will **not** be able to watch the agent without enabling a virtual screen, but you will be able to train the agent.  (_To watch the agent, you should follow the instructions to [enable a virtual screen](https://github.com/Unity-Technologies/ml-agents/blob/master/docs/Training-on-Amazon-Web-Service.md), and then download the environment for the **Linux** operating system above._)
 
 * Unzip the downloaded file and move it inside the project's root directory
-* Change the kernel of you environment to `drlnd`
+* Change the kernel of your environment to `drlnd`
 * Open the **params.py** file and change the path to the unity environment appropriately (UNITY_EXE_PATH=PATH_OF_THE_TENNIS_EXE)
 
 ## Getting started
